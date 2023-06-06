@@ -39,10 +39,10 @@ Test
 
 ::
 
-    $ pytest
+    $ python3 -m pytest
 
 Run with coverage report::
 
     $ coverage run -m pytest
-    $ coverage report --omit tests/*
-    $ coverage html  --omit tests/* # open htmlcov/index.html in a browser
+    $ coverage report
+    $ coverage html     # open htmlcov/index.html in a browser

@@ -1,6 +1,6 @@
 import pytest
 
-from flaskr.db import get_db
+from flaskr.db import get_post_by_id, get_all_posts
 
 
 def test_index(client, auth):
@@ -23,21 +23,15 @@ def test_login_required(client, path):
 
 
 def test_author_required(app, client, auth):
-    # change the post author to another user
-    with app.app_context():
-        db = get_db()
-        db.execute("UPDATE post SET author_id = 2 WHERE id = 1")
-        db.commit()
-
     auth.login()
     # current user can't modify other user's post
-    assert client.post("/1/update").status_code == 403
-    assert client.post("/1/delete").status_code == 403
+    assert client.post("/2/update").status_code == 403
+    assert client.post("/2/delete").status_code == 403
     # current user doesn't see edit link
-    assert b'href="/1/update"' not in client.get("/").data
+    assert b'href="/2/update"' not in client.get("/").data
 
 
-@pytest.mark.parametrize("path", ("/2/update", "/2/delete"))
+@pytest.mark.parametrize("path", ("/3/update", "/3/delete"))
 def test_exists_required(client, auth, path):
     auth.login()
     assert client.post(path).status_code == 404
@@ -49,9 +43,8 @@ def test_create(client, auth, app):
     client.post("/create", data={"title": "created", "body": ""})
 
     with app.app_context():
-        db = get_db()
-        count = db.execute("SELECT COUNT(id) FROM post").fetchone()[0]
-        assert count == 2
+        posts = get_all_posts()
+        assert len(posts) == 3
 
 
 def test_update(client, auth, app):
@@ -60,8 +53,7 @@ def test_update(client, auth, app):
     client.post("/1/update", data={"title": "updated", "body": ""})
 
     with app.app_context():
-        db = get_db()
-        post = db.execute("SELECT * FROM post WHERE id = 1").fetchone()
+        post = get_post_by_id(1)
         assert post["title"] == "updated"
 
 
@@ -78,6 +70,5 @@ def test_delete(client, auth, app):
     assert response.headers["Location"] == "/"
 
     with app.app_context():
-        db = get_db()
-        post = db.execute("SELECT * FROM post WHERE id = 1").fetchone()
+        post = get_post_by_id(1)
         assert post is None

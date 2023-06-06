@@ -53,11 +53,15 @@ def init_app(app):
 
 
 def get_user_by_id(id_):
-    return get_db().execute("SELECT * FROM user WHERE id = ?", (id_,)).fetchone()
+    return get_db().execute("""
+        SELECT * FROM user WHERE id = ?;
+    """, (id_,)).fetchone()
 
 
 def get_user_by_username(username):
-    return get_db().execute("SELECT * FROM user WHERE username = ?", (username,)).fetchone()
+    return get_db().execute("""
+        SELECT * FROM user WHERE username = ?;
+    """, (username,)).fetchone()
 
 
 class UserAlreadyExists(Exception):
@@ -67,49 +71,49 @@ class UserAlreadyExists(Exception):
 def register_user(username, password):
     db = get_db()
     try:
-        db.execute(
-            "INSERT INTO user (username, password) VALUES (?, ?)",
-            (username, password),
-        )
+        db.execute("""
+            INSERT INTO user (username, password) VALUES (?, ?);
+        """, (username, password))
         db.commit()
     except db.IntegrityError:
         raise UserAlreadyExists()
 
 
 def get_all_posts():
-    return get_db().execute(
-        "SELECT p.id, title, body, created, author_id, username"
-        " FROM post p JOIN user u ON p.author_id = u.id"
-        " ORDER BY created DESC"
-    ).fetchall()
+    return get_db().execute("""
+        SELECT p.id, title, body, created, author_id, username
+        FROM post p JOIN user u ON p.author_id = u.id
+        ORDER BY created DESC;
+    """).fetchall()
 
 
 def get_post_by_id(id_):
-   return get_db().execute(
-    "SELECT p.id, title, body, created, author_id, username"
-    " FROM post p JOIN user u ON p.author_id = u.id"
-    " WHERE p.id = ?", (id_,)
-   ).fetchone()
+    return get_db().execute("""
+        SELECT p.id, title, body, created, author_id, username
+        FROM post p JOIN user u ON p.author_id = u.id
+        WHERE p.id = ?;
+    """, (id_,)).fetchone()
 
 
 def add_post(title, body, author_id):
     db = get_db()
-    db.execute(
-        "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-        (title, body, author_id),
-    )
+    db.execute("""
+        INSERT INTO post (title, body, author_id) VALUES (?, ?, ?);
+    """, (title, body, author_id))
     db.commit()
 
 
 def update_post(id_, title, body):
     db = get_db()
-    db.execute(
-        "UPDATE post SET title = ?, body = ? WHERE id = ?", (title, body, id_)
-    )
+    db.execute("""
+        UPDATE post SET title = ?, body = ? WHERE id = ?;
+    """, (title, body, id_))
     db.commit()
 
 
 def delete_post(id_):
     db = get_db()
-    db.execute("DELETE FROM post WHERE id = ?", (id_,))
+    db.execute("""
+        DELETE FROM post WHERE id = ?;
+    """, (id_,))
     db.commit()

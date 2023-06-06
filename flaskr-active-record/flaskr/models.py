@@ -12,10 +12,9 @@ class User:
     def register(username, password_hash):
         db = get_db()
         try:
-            db.execute(
-                "INSERT INTO user (username, password) VALUES (?, ?)",
-                (username, password_hash),
-            )
+            db.execute("""
+                INSERT INTO user (username, password) VALUES (?, ?);
+            """, (username, password_hash))
             db.commit()
         except db.IntegrityError:
             raise UserAlreadyExists()
@@ -32,12 +31,16 @@ class User:
 
     @staticmethod
     def with_id(id_):
-        data = get_db().execute("SELECT id, username, password FROM user WHERE id = ?", (id_,)).fetchone()
+        data = get_db().execute("""
+            SELECT id, username, password FROM user WHERE id = ?;
+        """, (id_,)).fetchone()
         return User(data["id"], data["username"], data["password"])
 
     @staticmethod
     def with_username(username):
-        data = get_db().execute("SELECT id, username, password FROM user WHERE username = ?", (username,)).fetchone()
+        data = get_db().execute("""
+            SELECT id, username, password FROM user WHERE username = ?;
+        """, (username,)).fetchone()
         if data is None:
             return None
         return User(data["id"], data["username"], data["password"])
@@ -59,23 +62,23 @@ class Post:
     @staticmethod
     def create(title, body, author):
         db = get_db()
-        db.execute(
-            "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-            (title, body, author.id()),
-        )
+        db.execute("""
+            INSERT INTO post (title, body, author_id) VALUES (?, ?, ?);
+        """, (title, body, author.id()))
         db.commit()
 
     def update(self, title, body):
         db = get_db()
-        db.execute(
-            "UPDATE post SET title = ?, body = ? WHERE id = ?",
-            (title, body, self.id())
-        )
+        db.execute("""
+            UPDATE post SET title = ?, body = ? WHERE id = ?;
+        """, (title, body, self.id()))
         db.commit()
 
     def delete(self):
         db = get_db()
-        db.execute("DELETE FROM post WHERE id = ?", (self.id(),))
+        db.execute("""
+            DELETE FROM post WHERE id = ?;
+        """, (self.id(),))
         db.commit()
 
     def id(self):
@@ -95,18 +98,21 @@ class Post:
 
     @staticmethod
     def all():
-        posts = get_db().execute(
-            "SELECT id, title, body, created, author_id"
-            " FROM post ORDER BY created DESC"
-        ).fetchall()
-        return [Post(p["id"], p["title"], p["body"], User.with_id(p["author_id"]), p["created"])
+        posts = get_db().execute("""
+            SELECT id, title, body, created, author_id
+            FROM post ORDER BY created DESC;
+        """).fetchall()
+        return [Post(p["id"], p["title"], p["body"],
+                     User.with_id(p["author_id"]), p["created"])
                 for p in posts]
 
     @staticmethod
     def with_id(id_):
-        data = get_db().execute(
-            "SELECT id, title, body, created, author_id"
-            " FROM post WHERE id = ?", (id_,)).fetchone()
+        data = get_db().execute("""
+            SELECT id, title, body, created, author_id
+            FROM post WHERE id = ?
+        """, (id_,)).fetchone()
         if data is None:
             return None
-        return Post(data["id"], data["title"], data["body"], User.with_id(data["author_id"]), data["created"])
+        return Post(data["id"], data["title"], data["body"],
+                    User.with_id(data["author_id"]), data["created"])

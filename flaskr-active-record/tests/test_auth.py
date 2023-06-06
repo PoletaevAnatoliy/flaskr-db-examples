@@ -2,7 +2,7 @@ import pytest
 from flask import g
 from flask import session
 
-from flaskr.db import get_db
+from flaskr.models import User
 
 
 def test_register(client, app):
@@ -15,10 +15,7 @@ def test_register(client, app):
 
     # test that the user was inserted into the database
     with app.app_context():
-        assert (
-            get_db().execute("SELECT * FROM user WHERE username = 'a'").fetchone()
-            is not None
-        )
+        assert User.with_username('a') is not None
 
 
 @pytest.mark.parametrize(
