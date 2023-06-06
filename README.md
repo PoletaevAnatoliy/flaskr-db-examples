@@ -10,5 +10,5 @@
 ## Содержимое
 1. `flaskr-original` — изначальный Flaskr. Обращение к базе данных выполняется с помощью SQL-запросов, выполняемых в обработчиках HTTP-запросов.
 2. `flaskr-separated-db` — выполнение запросов выделено в отдельные функции в модуле `db`.
-3. `flaskr-active-record` — используется объектно-реляционного отображение по шаблону «активная запись» (Active Record).
-
+3. `flaskr-active-record` — используется объектно-реляционное отображение по шаблону «активная запись» (Active Record).
+4. `flaskr-flask-sqlalchemy` — используется объектно-реляцоное отображение по шаблону Data Mapper с помощью библиотеки [SQLAlchemy](https://www.sqlalchemy.org); её интеграция с Flask выполняется с помощью [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com).
